@@ -18,7 +18,8 @@ startup processes. (--index=1)
 
      heroku buildpacks:add --index=1 https://github.com/qawolf/heroku-buildpack-cloud-sql-proxy
 
-Add the GCP JSON credentials as `CLOUD_SQL_CREDENTIALS` env variable to you app.
+Add the **base64 encoded** GCP JSON credentials as `CLOUD_SQL_CREDENTIALS`
+env variable to you app.
 
 Set the instance the proxy should connect to with the `CLOUD_SQL_INSTANCE` env
 variable.
@@ -28,5 +29,10 @@ Format: `<gcp_project>:<gcp_region>:<instance_name>`
 Set the connection string for your DB library to
 `postgres://<username>:<password>@localhost:5432/<database-name>`
 
-Start the proxy before your app tries to connect to the database by e.g. adding
-`bin/run_cloud_sql_proxy` to the `.profile` in the root of your project.
+Start the proxy before your app boots by adding the run script to your `Procfile`.
+
+For example:
+
+```
+web: bin/run_cloud_sql_proxy && npm start
+```
