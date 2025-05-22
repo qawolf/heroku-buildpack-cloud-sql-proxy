@@ -6,7 +6,7 @@ set -euo pipefail
 CLOUD_SQL_DOWNLOAD="https://storage.googleapis.com/cloud-sql-connectors/cloud-sql-proxy/v2.14.0/cloud-sql-proxy.linux.amd64"
 
 log() {
-    echo "-----> $(printf '%s' "$@")" 1>&2
+	echo "-----> $(printf '%s' "$@")" 1>&2
 }
 
 log_extra() {
@@ -29,14 +29,29 @@ write_launch_script() {
 	local script_file="${1}"
 
 	touch "${script_file}"
-	cat <<EOF > "${script_file}"
-#!/bin/sh
+	cat <<EOF >"${script_file}"
 
-printf "%s" "\${CLOUD_SQL_CREDENTIALS}" | base64 -d > /app/google/credentials.json
-exec /app/google/bin/cloud_sql_proxy \\
-	--credentials-file=/app/google/credentials.json \\
-	--auto-iam-authn \\
-	\${CLOUD_SQL_INSTANCE} &
+	#!/bin/sh
+
+	# Decode service‐account JSON into a file
+	printf "%s" "${CLOUD_SQL_CREDENTIALS}" | base64 -d > /app/google/credentials.json
+
+	# --- start primary instance (no impersonation) ---
+	/app/google/bin/cloud_sql_proxy \
+		--credentials-file=/app/google/credentials.json \
+		--auto-iam-authn \
+		--instances="${CLOUD_SQL_INSTANCE}" &
+
+	# --- optionally start secondary instance (with impersonation) ---
+	if [ -n "${CLOUD_SQL_INSTANCE_2:-}" ]; then
+		/app/google/bin/cloud_sql_proxy \
+			--credentials-file=/app/google/credentials.json \
+			--auto-iam-authn \
+			--instances="${CLOUD_SQL_INSTANCE_2}" \
+			--impersonate-service-account="${CLOUD_SQL_IMPERSONATE_SERVICE_ACCOUNT}" &
+	fi
+
+	# (no exec here, this just backgrounds the proxies and lets the web process start normally)
 EOF
 	chmod +x "${script_file}"
 }
