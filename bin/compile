@@ -29,7 +29,7 @@ write_launch_script() {
 	local script_file="${1}"
 
 	touch "${script_file}"
-	cat <<EOF >"${script_file}"
+	cat <<'EOF' >"${script_file}"
 
 	#!/bin/sh
 
