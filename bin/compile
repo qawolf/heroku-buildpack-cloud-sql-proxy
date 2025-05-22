@@ -40,15 +40,15 @@ write_launch_script() {
 	/app/google/bin/cloud_sql_proxy \
 		--credentials-file=/app/google/credentials.json \
 		--auto-iam-authn \
-		--instances="${CLOUD_SQL_INSTANCE}" &
+		${CLOUD_SQL_INSTANCE} &
 
 	# --- optionally start secondary instance (with impersonation) ---
 	if [ -n "${CLOUD_SQL_INSTANCE_2:-}" ]; then
 		/app/google/bin/cloud_sql_proxy \
 			--credentials-file=/app/google/credentials.json \
 			--auto-iam-authn \
-			--instances="${CLOUD_SQL_INSTANCE_2}" \
-			--impersonate-service-account="${CLOUD_SQL_IMPERSONATE_SERVICE_ACCOUNT}" &
+			--impersonate-service-account="${CLOUD_SQL_IMPERSONATE_SERVICE_ACCOUNT}" \
+			${CLOUD_SQL_INSTANCE_2} &
 	fi
 
 	# (no exec here, this just backgrounds the proxies and lets the web process start normally)
