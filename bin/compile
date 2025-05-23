@@ -48,7 +48,7 @@ write_launch_script() {
 			--run-connection-test \
 			--credentials-file=/app/google/credentials.json \
 			--auto-iam-authn \
-			--impersonate-service-account="${CLOUD_SQL_IMPERSONATE_SERVICE_ACCOUNT}" \
+			--impersonate-service-account="${CLOUD_SQL_2_IMPERSONATE_SERVICE_ACCOUNT}" \
 			${CLOUD_SQL_INSTANCE_2} &
 	fi
 
